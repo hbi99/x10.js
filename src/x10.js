@@ -6,11 +6,11 @@
 		init: function() {
 			return this;
 		},
-		work_handler: function(e) {
-			var args = Array.prototype.slice.call(e.data, 1),
-				func = e.data[0],
+		work_handler: function(event) {
+			var args = Array.prototype.slice.call(event.data, 1),
+				func = event.data[0],
 				ret  = tree[func].call(tree, args);
-			postMessage( ret );
+			postMessage([func, ret]);
 		},
 		get_worker: function(script) {
 			var url     = window.URL || window.webkitURL,
@@ -18,35 +18,40 @@
 									{type: 'text/javascript'}),
 				worker  = new Worker(url.createObjectURL(blob));
 
-			worker.onmessage = function(e) {
-				x10.observer.emit('x10:find', e.data);
+			worker.onmessage = function(event) {
+				var args = Array.prototype.slice.call(event.data, 1),
+					func = event.data[0];
+				x10.observer.emit('x10:'+ func, args);
 			};
 
 			return worker;
 		},
-		compile: function(tree) {
-			var script = 'var tree = {'+ this.parse(tree).join(',') +'};',
-				worker = this.get_worker(script),
-				obj    = {};
-
-			obj.find = function() {
+		call_handler: function(func, worker) {
+			return function() {
 				var args = Array.prototype.slice.call(arguments, 0, -1),
-					callback = arguments[arguments.length-1],
-					func = 'find';
-
-				console.log(worker);
+					callback = arguments[arguments.length-1];
 
 				// add method name
 				args.unshift(func);
 
 				// listen for 'done'
 				x10.observer.on('x10:'+ func, function(event) {
-					callback(event.detail);
+					callback(event.detail[0]);
 				});
 
 				// start worker
 				worker.postMessage(args);
 			};
+		},
+		compile: function(tree) {
+			var script = 'var tree = {'+ this.parse(tree).join(',') +'};',
+				worker = this.get_worker(script),
+				obj    = {},
+				fn;
+
+			for (fn in tree) {
+				obj[fn] = this.call_handler(fn, worker);
+			}
 
 			return obj;
 		},

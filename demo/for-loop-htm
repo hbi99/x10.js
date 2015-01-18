@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>x10.js - for-loop</title>
+<script src="../src/x10.js"></script>
+<script type="text/javascript">
+
+var obj = {
+		loop: function(len) {
+			while (len--) {}
+		}
+	},
+	task = x10.compile(obj),
+	start,
+	found;
+
+// UI thread
+start = Date.now();
+found = obj.loop(100000000);
+console.log( Date.now() - start );
+
+// worker thread
+start = Date.now();
+task.loop(100000000, function() {
+	console.log( Date.now() - start );
+});
+
+</script>
+</head>
+<body>
+
+</body>
+</html>

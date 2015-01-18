@@ -46,13 +46,12 @@ var task = x10.compile(obj),
 
 
 start = Date.now();
-found = obj.find(300000);
+found = obj.find(1000000);
 console.log( Date.now() - start );
-//console.log(found);
 
 
 start = Date.now();
-task.find(300000, function(found) {
+task.find(1000000, function(found) {
 	console.log( Date.now() - start );
 });
 
