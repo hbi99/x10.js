@@ -19,6 +19,7 @@
 				blob    = new Blob([script + 'self.addEventListener("message", '+ this.work_handler.toString() +', false);'],
 									{type: 'text/javascript'}),
 				worker  = new Worker(url.createObjectURL(blob));
+			
 			// thread pipe
 			worker.onmessage = function(event) {
 				var args = Array.prototype.slice.call(event.data, 1),
@@ -78,6 +79,7 @@
 					case Object:   val = '{'+ this.parse(v).join(',') +'}';       break;
 					case Array:    val = '['+ this.parse(v, true).join(',') +']'; break;
 					case String:   val = '"'+ v.replace(/"/g, '\\"') +'"';        break;
+					case RegExp:
 					case Function: val = v.toString();                            break;
 					default:       val = v;
 				}

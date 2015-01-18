@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>x10.js - RegExp</title>
+<script src="../src/x10.js"></script>
+</head>
+<body>
+
+<pre id="output" style="font-family: Menlo; font-size: 0.85em;"></pre>
+
+<script type="text/javascript">
+
+var obj = {
+	rx : /^(?!xml)[a-z_][\w\d.:]*$/i,
+	test: function(len) {
+		console.log(this.rx);
+	}
+};
+
+
+// compile the object with 'x10.js'
+var task = x10.compile(obj);
+
+// worker thread - UI thread is NOT blocked when executing this
+start = Date.now();
+task.test(10, function(found) {
+	console.log( Date.now() - start );
+});
+
+</script>
+
+</body>
+</html>
