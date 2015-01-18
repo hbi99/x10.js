@@ -1,5 +1,5 @@
 /* 
- * x10.js v0.1.0 
+ * x10.js v0.1.1 
  * Web worker wrapper with simple interface 
  * 
  * Copyright (c) 2013-2015, Hakan Bilgin <hbi@longscript.com> 
@@ -26,6 +26,7 @@
 				blob    = new Blob([script + 'self.addEventListener("message", '+ this.work_handler.toString() +', false);'],
 									{type: 'text/javascript'}),
 				worker  = new Worker(url.createObjectURL(blob));
+			
 			// thread pipe
 			worker.onmessage = function(event) {
 				var args = Array.prototype.slice.call(event.data, 1),
@@ -85,6 +86,7 @@
 					case Object:   val = '{'+ this.parse(v).join(',') +'}';       break;
 					case Array:    val = '['+ this.parse(v, true).join(',') +']'; break;
 					case String:   val = '"'+ v.replace(/"/g, '\\"') +'"';        break;
+					case RegExp:
 					case Function: val = v.toString();                            break;
 					default:       val = v;
 				}
