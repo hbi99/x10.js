@@ -27,14 +27,16 @@ var obj = {
 };
 
 
-var task = x10.compile(obj),
-	start;
-
-start = Date.now();
-found = obj.find(1000000);
+// UI thread IS blocked when executing this
+var start = Date.now();
+var found = obj.find(1000000);
 console.log( Date.now() - start );
 
 
+// compile the object with 'x10.js'
+var task = x10.compile(obj);
+
+// worker thread - UI thread is NOT blocked when executing this
 start = Date.now();
 task.find(1000000, function(found) {
 	console.log( Date.now() - start );
