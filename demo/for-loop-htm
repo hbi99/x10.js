@@ -12,8 +12,7 @@ var obj = {
 		}
 	},
 	task = x10.compile(obj),
-	start,
-	found;
+	start;
 
 // UI thread
 start = Date.now();

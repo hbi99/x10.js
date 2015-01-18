@@ -3,16 +3,6 @@
 <head>
 <meta charset="utf-8">
 <title>x10.js - Primenumbers</title>
-<style type="text/css">
-
-pre { font-family: Menlo; font-size: 0.85em; }
-
-</style>
-</head>
-<body>
-
-<pre id="output"></pre>
-
 <script src="../src/x10.js"></script>
 <script type="text/javascript">
 
@@ -41,10 +31,6 @@ var task = x10.compile(obj),
 	start,
 	found;
 
-//document.getElementById('output').innerHTML = task;
-
-
-
 start = Date.now();
 found = obj.find(1000000);
 console.log( Date.now() - start );
@@ -56,6 +42,8 @@ task.find(1000000, function(found) {
 });
 
 </script>
+</head>
+<body>
 
 </body>
 </html>
