@@ -13,19 +13,21 @@
 
 var obj = {
 	rx : /^(?!xml)[a-z_][\w\d.:]*$/i,
-	test: function(len) {
-		console.log(this.rx);
+	boom: function(t, b) {
+		return b;
 	}
 };
 
+obj.boom({a: 2});
 
 // compile the object with 'x10.js'
 var task = x10.compile(obj);
 
 // worker thread - UI thread is NOT blocked when executing this
 start = Date.now();
-task.test(10, function(found) {
-	console.log( Date.now() - start );
+task.boom({a: 2}, 3, function(found) {
+	//console.log( Date.now() - start );
+	console.log(found);
 });
 
 </script>

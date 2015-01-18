@@ -9,7 +9,8 @@
 		work_handler: function(event) {
 			var args = Array.prototype.slice.call(event.data, 1),
 				func = event.data[0],
-				ret  = tree[func].call(tree, args);
+				ret  = tree[func].apply(tree, args);
+
 			// return process finish
 			postMessage([func, ret]);
 		},

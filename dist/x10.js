@@ -1,5 +1,5 @@
 /* 
- * x10.js v0.1.1 
+ * x10.js v0.1.2 
  * Web worker wrapper with simple interface 
  * 
  * Copyright (c) 2013-2015, Hakan Bilgin <hbi@longscript.com> 
@@ -16,7 +16,8 @@
 		work_handler: function(event) {
 			var args = Array.prototype.slice.call(event.data, 1),
 				func = event.data[0],
-				ret  = tree[func].call(tree, args);
+				ret  = tree[func].apply(tree, args);
+
 			// return process finish
 			postMessage([func, ret]);
 		},
