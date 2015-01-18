@@ -1,0 +1,33 @@
+{
+  "name": "x10.js",
+  "version": "0.0.1",
+  "description": "Web worker wrapper with simple interface",
+  "author": {
+    "name": "Hakan Bilgin",
+    "email": "hbi@longscript.com",
+    "url": "https://github.com/hbi99"
+  },
+  "keywords": [
+    "web worker",
+    "thread",
+    "javascript"
+  ],
+  "license": {
+    "type": "MIT",
+    "url": "http://mit-license.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hbi99/x10.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hbi99/x10.js/issues"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-jshint": "~0.8.0",
+    "grunt-contrib-uglify": "~0.3.2"
+  }
+}
