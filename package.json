@@ -1,6 +1,6 @@
 {
   "name": "x10.js",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Web worker wrapper with simple interface",
   "author": {
     "name": "Hakan Bilgin",

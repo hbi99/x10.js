@@ -1,5 +1,5 @@
 /* 
- * x10.js v0.0.1 
+ * x10.js v0.1.0 
  * Web worker wrapper with simple interface 
  * 
  * Copyright (c) 2013-2015, Hakan Bilgin <hbi@longscript.com> 
@@ -13,48 +13,53 @@
 		init: function() {
 			return this;
 		},
-		work_handler: function(e) {
-			var args = Array.prototype.slice.call(e.data, 1),
-				func = e.data[0],
+		work_handler: function(event) {
+			var args = Array.prototype.slice.call(event.data, 1),
+				func = event.data[0],
 				ret  = tree[func].call(tree, args);
-			postMessage( ret );
+			// return process finish
+			postMessage([func, ret]);
 		},
-		get_worker: function(script) {
+		setup: function(tree) {
 			var url     = window.URL || window.webkitURL,
+				script  = 'var tree = {'+ this.parse(tree).join(',') +'};',
 				blob    = new Blob([script + 'self.addEventListener("message", '+ this.work_handler.toString() +', false);'],
 									{type: 'text/javascript'}),
 				worker  = new Worker(url.createObjectURL(blob));
-
-			worker.onmessage = function(e) {
-				x10.observer.emit('x10:find', e.data);
+			// thread pipe
+			worker.onmessage = function(event) {
+				var args = Array.prototype.slice.call(event.data, 1),
+					func = event.data[0];
+				x10.observer.emit('x10:'+ func, args);
 			};
 
 			return worker;
 		},
-		compile: function(tree) {
-			var script = 'var tree = {'+ this.parse(tree).join(',') +'};',
-				worker = this.get_worker(script),
-				obj    = {};
-
-			obj.find = function() {
+		call_handler: function(func, worker) {
+			return function() {
 				var args = Array.prototype.slice.call(arguments, 0, -1),
-					callback = arguments[arguments.length-1],
-					func = 'find';
-
-				console.log(worker);
+					callback = arguments[arguments.length-1];
 
 				// add method name
 				args.unshift(func);
 
 				// listen for 'done'
 				x10.observer.on('x10:'+ func, function(event) {
-					callback(event.detail);
+					callback(event.detail[0]);
 				});
 
 				// start worker
 				worker.postMessage(args);
 			};
-
+		},
+		compile: function(tree) {
+			var worker = this.setup(tree),
+				obj    = {},
+				fn;
+			// create return object
+			for (fn in tree) {
+				obj[fn] = this.call_handler(fn, worker);
+			}
 			return obj;
 		},
 		parse: function(tree, isArray) {

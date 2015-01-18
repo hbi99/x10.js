@@ -10,14 +10,16 @@
 			var args = Array.prototype.slice.call(event.data, 1),
 				func = event.data[0],
 				ret  = tree[func].call(tree, args);
+			// return process finish
 			postMessage([func, ret]);
 		},
-		get_worker: function(script) {
+		setup: function(tree) {
 			var url     = window.URL || window.webkitURL,
+				script  = 'var tree = {'+ this.parse(tree).join(',') +'};',
 				blob    = new Blob([script + 'self.addEventListener("message", '+ this.work_handler.toString() +', false);'],
 									{type: 'text/javascript'}),
 				worker  = new Worker(url.createObjectURL(blob));
-
+			// thread pipe
 			worker.onmessage = function(event) {
 				var args = Array.prototype.slice.call(event.data, 1),
 					func = event.data[0];
@@ -44,15 +46,13 @@
 			};
 		},
 		compile: function(tree) {
-			var script = 'var tree = {'+ this.parse(tree).join(',') +'};',
-				worker = this.get_worker(script),
+			var worker = this.setup(tree),
 				obj    = {},
 				fn;
-
+			// create return object
 			for (fn in tree) {
 				obj[fn] = this.call_handler(fn, worker);
 			}
-
 			return obj;
 		},
 		parse: function(tree, isArray) {
