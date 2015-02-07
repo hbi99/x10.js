@@ -15,7 +15,9 @@ module.exports = function (grunt) {
 						' * Licensed under the <%= pkg.license.type %> License \n' +
 						' */ \n',
 			source    : [
-							'src/x10.js'
+							'lib/eval.js',
+							'lib/worker.js',
+							'lib/x10.js'
 						]
 		},
 
@@ -71,7 +73,7 @@ module.exports = function (grunt) {
 
 	grunt.registerTask('default', [
 		'jshint',
-		'test',
+	//	'test',
 		'concat:latest',
     	'uglify:latest'
 	]);

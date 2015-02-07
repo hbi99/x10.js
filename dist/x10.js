@@ -1,10 +1,51 @@
 /* 
- * x10.js v0.1.2 
+ * x10.js v0.1.3 
  * Web worker wrapper with simple interface 
  * 
  * Copyright (c) 2013-2015, Hakan Bilgin <hbi@longscript.com> 
  * Licensed under the MIT License 
  */ 
+var isNode = typeof module !== 'undefined' && module.exports;
+
+if (isNode) {
+	process.once('message', function (code) {
+		//eval(JSON.parse(code).data);
+	});
+} else {
+	self.onmessage = function (code) {
+		//eval(code.data);
+	};
+}
+var ps = require('child_process');
+
+function Worker(url) {
+	var that = this;
+	this.process = ps.fork(url);
+	this.process.on('message', function (msg) {
+		if (that.onmessage) {
+			that.onmessage({ data: JSON.parse(msg) });
+		}
+	});
+	this.process.on('error', function (err) {
+		if (that.onerror) {
+			that.onerror(err);
+		}
+	});
+}
+
+Worker.prototype.onmessage = null;
+Worker.prototype.onerror = null;
+
+Worker.prototype.postMessage = function (obj) {
+	this.process.send(JSON.stringify({ data: obj }));
+};
+
+Worker.prototype.terminate = function () {
+	this.process.kill();
+};
+
+module.exports = Worker;
+
 
 (function(window, undefined) {
 	//'use strict';
@@ -22,11 +63,11 @@
 			postMessage([func, ret]);
 		},
 		setup: function(tree) {
-			var url     = window.URL || window.webkitURL,
-				script  = 'var tree = {'+ this.parse(tree).join(',') +'};',
-				blob    = new Blob([script + 'self.addEventListener("message", '+ this.work_handler.toString() +', false);'],
+			var url    = window.URL || window.webkitURL,
+				script = 'var tree = {'+ this.parse(tree).join(',') +'};',
+				blob   = new Blob([script + 'self.addEventListener("message", '+ this.work_handler.toString() +', false);'],
 									{type: 'text/javascript'}),
-				worker  = new Worker(url.createObjectURL(blob));
+				worker = new Worker(url.createObjectURL(blob));
 			
 			// thread pipe
 			worker.onmessage = function(event) {
@@ -54,15 +95,20 @@
 				worker.postMessage(args);
 			};
 		},
-		compile: function(tree) {
-			var worker = this.setup(tree),
+		compile: function(hash) {
+			var worker = this.setup(typeof(hash) === 'function' ? {func: hash} : hash),
 				obj    = {},
 				fn;
 			// create return object
-			for (fn in tree) {
-				obj[fn] = this.call_handler(fn, worker);
+			if (typeof(hash) === 'function') {
+				obj.func = this.call_handler('func', worker);
+				return obj.func;
+			} else {
+				for (fn in hash) {
+					obj[fn] = this.call_handler(fn, worker);
+				}
+				return obj;
 			}
-			return obj;
 		},
 		parse: function(tree, isArray) {
 			var hash = [],
@@ -132,7 +178,11 @@
 		})()
 	};
 
-	// publish x10
-	window.x10 = x10.init();
+	if (typeof module === "undefined") {
+		// publish x10
+		window.x10 = x10.init();
+	} else {
+		module.exports = x10.init();
+	}
 
-})(window);
+})(this);
