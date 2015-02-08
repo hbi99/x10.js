@@ -15,8 +15,8 @@ module.exports = function (grunt) {
 						' * Licensed under the <%= pkg.license.type %> License \n' +
 						' */ \n',
 			source    : [
-							'lib/eval.js',
-							'lib/worker.js',
+						//	'lib/eval.js',
+						//	'lib/worker.js',
 							'lib/x10.js'
 						]
 		},
